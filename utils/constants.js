@@ -29,4 +29,6 @@ Rellena cada espacio del cartón que esté vacío o donde el número no sea legi
 
 Si no se encuentran cartones de bingo legibles en la imagen, devuelve un array JSON vacío: [].
 
+Si identificas un id unico por cartón y entre los números esta en 0 el del centro, reemplazalo por este id
+
 No incluyas texto explicativo, solo el JSON.`

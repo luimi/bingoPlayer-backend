@@ -2,14 +2,15 @@ require('dotenv').config()
 const express = require('express')
 const path = require('path');
 const multer = require('multer');
-const Tesseract = require('tesseract.js');
-const { Jimp } = require('jimp');
-const transformer = require('./utils/transformer');
+
+
+const { md2json } = require('./utils/utils');
 const gemini = require('./utils/gemini');
+const openrouter = require('./utils/openrouter')
 const fs = require('fs');
 const app = express();
 
-const { PORT } = process.env
+const { PORT, STATUS } = process.env
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -50,27 +51,12 @@ app.post('/scan', upload.single('image'), async (req, res) => {
         return res.send({ success: false, code: 1 })
     }
 
-    // Cambiar el tono de la imagen a blanco y negro
+    let result;
+
     try {
-        const image = await Jimp.read(req.file.path);
-        image.greyscale().threshold({ max: 100 }).write(req.file.path);
-    } catch (err) {
-        return res.send({ success: false, code: 2 })
-    }
+        result = await openrouter(req.file.path)
+    } catch (e) { }
 
-    // Pasar el OCR para identificar los numeros
-    const { createWorker } = Tesseract;
-    const worker = await createWorker('eng');
-    await worker.setParameters({
-        tessedit_char_whitelist: '0123456789',
-    });
-    const {
-        data: { text },
-    } = await worker.recognize(req.file.path);
-
-    if (!text) {
-        return res.send({ success: false, code: 3 })
-    }
 
     // Eliminar imagen subida
     fs.unlink(req.file.path, (err) => {
@@ -79,51 +65,16 @@ app.post('/scan', upload.single('image'), async (req, res) => {
         }
     });
 
-    const result = [];
-    text.split("\n").forEach((row) => {
-        let numbers = row.trim();
-        numbers = numbers.replace(/\s/g, "");
-        if (numbers.length >= 7) result.push(transformer.getRow(numbers))
-    });
+    if (result) result = md2json(result);
 
-    // Evaluar la respuesta
-    if (result.length !== 5) {
+    if (!result || result.length === 0) {
         return res.send({ success: false, code: 4 })
     }
     return res.send({ success: true, data: result })
 })
 
-/**
- * Scan bingo cards to get its numbers
- * 
- * Errors code:
- * 1 - No image attached
- * 2 - Could not grayscale picture
- * 3 - Error reading image
- * 4 - Error parsing data
- */
-app.post('/multipleScan', upload.single('image'), async (req, res) => {
-    if (!req.file) {
-        return res.send({ success: false, code: 1 })
-    }
-
-    // Obtener los cartones
-    let result = await gemini.getCards(req.file.path)
-
-    // Eliminar imagen subida
-    fs.unlink(req.file.path, (err) => {
-        if (err) {
-            console.error("Failed to delete image:", err);
-        }
-    });
-
-    result = transformer.stringToJson(result)
-
-    // Evaluar la respuesta
-    if (!result || result.length === 0) {
-        return res.send({ success: false, code: 4 })
-    }
-    return res.send({ success: true, data: result })
+app.get('/status', (req, res) => {
+    res.send({ status: STATUS })
 })
 
 app.listen(PORT, () => {

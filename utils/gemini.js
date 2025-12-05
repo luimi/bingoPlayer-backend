@@ -7,8 +7,7 @@ const { GEMINI_MODEL } = process.env
 
 const ai = new GoogleGenAI({});
 
-module.exports = {
-    getCards: async (imagePath) => {
+const getCards = async (imagePath) => {
 
         if (!fs.existsSync(imagePath)) {
             throw new Error(`Error: El archivo de imagen no se encuentra en la ruta: ${imagePath}`);
@@ -35,4 +34,5 @@ module.exports = {
 
         return response.text;
     }
-}
+
+module.exports = getCards

@@ -1,4 +1,5 @@
 import path from 'path';
+import fs from 'fs';
 
 export const md2json = (md) => {
     try {
@@ -13,4 +14,10 @@ export const md2json = (md) => {
 }
 export const imagePath = (imageName) => {
     return path.join(import.meta.dirname, '../uploads', imageName);
+}
+
+export const img2b64 = async (imagePath) => {
+    const imageBuffer = await fs.promises.readFile(imagePath);
+    const base64Image = imageBuffer.toString('base64');
+    return `data:image/${imagePath.endsWith('.png') ? 'png' : 'jpeg'};base64,${base64Image}`;
 }

@@ -7,7 +7,8 @@
     "start": "node index.js",
     "manual": "node tests/manual.js",
     "gemini": "node tests/gemini.js",
-    "openrouter": "node tests/openrouter.js"
+    "openrouter": "node tests/openrouter.js",
+    "groq": "node tests/groq.js"
   },
   "keywords": [
     "lui2mi.",
@@ -21,6 +22,7 @@
     "@openrouter/sdk": "^0.2.9",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "groq-sdk": "^0.37.0",
     "jimp": "^1.6.0",
     "multer": "^2.0.2",
     "tesseract.js": "^6.0.1"

@@ -6,11 +6,13 @@ const multer = require('multer');
 
 const { md2json } = require('./utils/utils');
 const gemini = require('./utils/gemini');
-const openrouter = require('./utils/openrouter')
+const openrouter = require('./utils/openrouter');
+const groq = require('./utils/groq');
+
 const fs = require('fs');
 const app = express();
 
-const { PORT, STATUS } = process.env
+const { PORT } = process.env
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -33,6 +35,14 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+const providers = [
+    { action: openrouter, limit: 50 },
+    { action: groq, limit: 1000 },
+]
+
+let limits = [0];
+let status = true;
+
 app.get('/', (req, res) => {
     res.send('API de BingoPlayer')
 })
@@ -54,9 +64,18 @@ app.post('/scan', upload.single('image'), async (req, res) => {
     let result;
 
     try {
-        result = await openrouter(req.file.path)
+        const index = limits.length - 1;
+        result = await providers[index].action(req.file.path);
+        limits[index]++;
+        if(limits[index] === providers[index].limit && limits.length < providers.length) {
+            limits.push(0);
+        }
+
     } catch (e) { }
 
+    if(limits.length  === providers.length && limits.at(-1) === providers.at(-1).limit) {
+        status = false;
+    }
 
     // Eliminar imagen subida
     fs.unlink(req.file.path, (err) => {
@@ -74,7 +93,7 @@ app.post('/scan', upload.single('image'), async (req, res) => {
 })
 
 app.get('/status', (req, res) => {
-    res.send({ status: STATUS })
+    res.send({ status, limits })
 })
 
 app.listen(PORT, () => {

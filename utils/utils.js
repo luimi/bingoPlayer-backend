@@ -21,3 +21,20 @@ export const img2b64 = async (imagePath) => {
     const base64Image = imageBuffer.toString('base64');
     return `data:image/${imagePath.endsWith('.png') ? 'png' : 'jpeg'};base64,${base64Image}`;
 }
+
+export const validateCards = (cards) => {
+    let result = true;
+    cards.forEach(card => {
+        if (card.length !== 5) {
+            result = false;
+            return;
+        }
+        card.forEach(row => {
+            if (row.length !== 5) {
+                result = false;
+                return;
+            }
+        })
+    });
+    return result;
+}

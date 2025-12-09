@@ -29,6 +29,6 @@ Rellena cada espacio del cartón que esté vacío o donde el número no sea legi
 
 Si no se encuentran cartones de bingo legibles en la imagen, devuelve un array JSON vacío: [].
 
-Si identificas un id unico por cartón y entre los números esta en 0 el del centro, reemplazalo por este id
+No incluyas texto explicativo, solo el JSON.`;
 
-No incluyas texto explicativo, solo el JSON.`
+export const prompt2 = `Analiza esta imagen y devuelve un array en JSON donde extraigas los numeros de bingo en este formato [[[1,15,23,43,69], [2,16,24,45,70], ...]] donde el primer arreglo contiene cada carton de bingo que veas, si en alguno de las celdas no hay numero entero, rellena los campos con el numero cero, si no hay cartones legibles devuelve un array vacio`;

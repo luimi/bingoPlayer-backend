@@ -4,7 +4,7 @@ const path = require('path');
 const multer = require('multer');
 
 
-const { md2json } = require('./utils/utils');
+const { md2json, validateCards } = require('./utils/utils');
 const gemini = require('./utils/gemini');
 const openrouter = require('./utils/openrouter');
 const groq = require('./utils/groq');
@@ -12,7 +12,7 @@ const groq = require('./utils/groq');
 const fs = require('fs');
 const app = express();
 
-const { PORT } = process.env
+const { PORT, GEMINI_API_KEY, GEMINI_MODEL, OPENROUTER_API_KEY, OPENROUTER_MODEL, GROQ_API_KEY, GROQ_MODEL } = process.env
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -35,10 +35,19 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-const providers = [
-    { action: openrouter, limit: 50 },
-    { action: groq, limit: 1000 },
-]
+const providers = []
+
+if (GEMINI_API_KEY && GEMINI_MODEL) {
+    providers.push({ id: 'Gemini', action: gemini, limit: 50 })
+}
+
+if (OPENROUTER_API_KEY && OPENROUTER_MODEL) {
+    providers.push({ id: 'OpenRouter', action: openrouter, limit: 50 })
+}
+
+if (GROQ_API_KEY && GROQ_MODEL) {
+    providers.push({ id: 'Groq', action: groq, limit: 1000 })
+}
 
 let limits = [0];
 let status = true;
@@ -63,17 +72,23 @@ app.post('/scan', upload.single('image'), async (req, res) => {
 
     let result;
 
-    try {
+    while (!result) {
         const index = limits.length - 1;
-        result = await providers[index].action(req.file.path);
-        limits[index]++;
-        if(limits[index] === providers[index].limit && limits.length < providers.length) {
-            limits.push(0);
+        try {
+            result = await providers[index].action(req.file.path);
+            //TODO agregar opcion para guardar imagen y resultado en otro lado
+            limits[index]++;
+            if (limits[index] === providers[index].limit && limits.length < providers.length) {
+                limits.push(0);
+            }
+        } catch (e) {
+            console.error("Ai failed:", e.message)
+            limits[index] = providers[index].limit;
+            limits.push(0)
         }
+    }
 
-    } catch (e) { }
-
-    if(limits.length  === providers.length && limits.at(-1) === providers.at(-1).limit) {
+    if (limits.length === providers.length && limits.at(-1) === providers.at(-1).limit) {
         status = false;
     }
 
@@ -86,7 +101,7 @@ app.post('/scan', upload.single('image'), async (req, res) => {
 
     if (result) result = md2json(result);
 
-    if (!result || result.length === 0) {
+    if (!result || result.length === 0 || !validateCards(result)) {
         return res.send({ success: false, code: 4 })
     }
     return res.send({ success: true, data: result })

@@ -4,7 +4,7 @@ const path = require('path');
 const multer = require('multer');
 
 
-const { md2json, validateCards } = require('./utils/utils');
+const { md2json, validateCards, analytic } = require('./utils/utils');
 const gemini = require('./utils/gemini');
 const openrouter = require('./utils/openrouter');
 const groq = require('./utils/groq');
@@ -76,7 +76,7 @@ app.post('/scan', upload.single('image'), async (req, res) => {
         const index = limits.length - 1;
         try {
             result = await providers[index].action(req.file.path);
-            //TODO agregar opcion para guardar imagen y resultado en otro lado
+            analytic(providers[index].id, result, req.file.path)
             limits[index]++;
             if (limits[index] === providers[index].limit && limits.length < providers.length) {
                 limits.push(0);

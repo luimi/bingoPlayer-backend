@@ -1,5 +1,10 @@
 import path from 'path';
 import fs from 'fs';
+import dotenv from 'dotenv'
+
+dotenv.config()
+
+const { ANALYTIC_SERVER, ANALYTIC_APPID, ANALYTIC_RESTID } = process.env
 
 export const md2json = (md) => {
     try {
@@ -37,4 +42,28 @@ export const validateCards = (cards) => {
         })
     });
     return result;
+}
+
+export const analytic = async (server, result, imagePath) => {
+    if(!ANALYTIC_APPID || !ANALYTIC_RESTID || !ANALYTIC_SERVER) return;
+    const image = await img2b64(imagePath)
+    const myHeaders = new Headers();
+    myHeaders.append("X-Parse-Application-Id", ANALYTIC_APPID);
+    myHeaders.append("X-Parse-REST-API-Key", ANALYTIC_RESTID);
+    myHeaders.append("Content-Type", "application/json");
+
+    const raw = JSON.stringify({
+        "server": server,
+        "result": result,
+        "image": image
+    });
+
+    const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow"
+    };
+
+    fetch(`${ANALYTIC_SERVER}/classes/CardsScan`, requestOptions);
 }

@@ -25,6 +25,7 @@
     "groq-sdk": "^0.37.0",
     "jimp": "^1.6.0",
     "multer": "^2.0.2",
+    "node-cron": "^4.2.1",
     "tesseract.js": "^6.0.1"
   }
 }

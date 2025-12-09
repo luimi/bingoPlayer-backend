@@ -2,6 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const path = require('path');
 const multer = require('multer');
+const cron = require("node-cron");
 
 
 const { md2json, validateCards, analytic } = require('./utils/utils');
@@ -48,6 +49,18 @@ if (OPENROUTER_API_KEY && OPENROUTER_MODEL) {
 if (GROQ_API_KEY && GROQ_MODEL) {
     providers.push({ id: 'Groq', action: groq, limit: 1000 })
 }
+
+cron.schedule(
+    "0 0 * * *",
+    () => {
+        limits = [0];
+        status = true;
+    },
+    {
+        scheduled: true,
+        timezone: "UTC"
+    }
+);
 
 let limits = [0];
 let status = true;

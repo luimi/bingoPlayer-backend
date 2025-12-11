@@ -95,9 +95,14 @@ app.post('/scan', upload.single('image'), async (req, res) => {
                 limits.push(0);
             }
         } catch (e) {
-            console.error("Ai failed:", e.message)
+            console.error("Ai failed:", providers[index].id ,e.message);
             limits[index] = providers[index].limit;
-            limits.push(0)
+            if(limits.length === providers.length) {
+                result = [];
+            } else {
+                limits.push(0)
+            }
+            
         }
     }
 

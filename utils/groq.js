@@ -8,37 +8,32 @@ const { GROQ_MODEL } = process.env;
 
 const getCards = async (imagePath) => {
     const base64Image = await utils.img2b64(imagePath);
-    try {
-        const chatCompletion = await groq.chat.completions.create({
-            "messages": [
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": constants.prompt
-                        },
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": base64Image
-                            }
+    const chatCompletion = await groq.chat.completions.create({
+        "messages": [
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": constants.prompt
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": base64Image
                         }
-                    ]
-                }
-            ],
-            "model": GROQ_MODEL,
-            "temperature": 1,
-            "max_completion_tokens": 1024,
-            "top_p": 1,
-            "stream": false,
-            "stop": null
-        });
-        return chatCompletion.choices[0].message.content;
-    } catch (e) {
-        console.log("error", e)
-        return null;
-    }
+                    }
+                ]
+            }
+        ],
+        "model": GROQ_MODEL,
+        "temperature": 1,
+        "max_completion_tokens": 1024,
+        "top_p": 1,
+        "stream": false,
+        "stop": null
+    });
+    return chatCompletion.choices[0].message.content;
 
 }
 

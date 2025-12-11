@@ -23,6 +23,7 @@
     "jimp": "^1.6.0",
     "multer": "^2.0.2",
     "node-cron": "^4.2.1",
+    "openai": "^6.10.0",
     "tesseract.js": "^6.0.1"
   }
 }

@@ -2,6 +2,7 @@ import gemini from './utils/gemini.js';
 import openrouter from './utils/openrouter.js';
 import groq from './utils/groq.js';
 import manual from './utils/manual.js';
+import openai from './utils/openai.js';
 import { imagePath, md2json, validateCards } from './utils/utils.js';
 
 const providers = {
@@ -9,6 +10,7 @@ const providers = {
     'openrouter': openrouter,
     'groq': groq,
     'manual': manual,
+    'openai': openai,
 }
 
 const [_, __, provider, image] = process.argv;

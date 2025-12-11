@@ -1,6 +1,7 @@
 import path from 'path';
 import fs from 'fs';
-import dotenv from 'dotenv'
+import dotenv from 'dotenv';
+import { Jimp } from 'jimp';
 
 dotenv.config()
 
@@ -9,18 +10,18 @@ const { ANALYTIC_SERVER, ANALYTIC_APPID, ANALYTIC_RESTID } = process.env
 export const md2json = (md) => {
     try {
         const cleanedString = md.replace(/```json\n/g, '')
-        .replace(/JSON/g, '')
-        .replace(/\n```/g, '')
-        .replace(/\s+/g, '')
-        .trim();
-      
+            .replace(/JSON/g, '')
+            .replace(/\n```/g, '')
+            .replace(/\s+/g, '')
+            .trim();
+
         const m3b = cleanedString.match(/\[\[\[.*?\]\]\]/g);
         let last;
-        if(m3b) {
-          last = m3b.at(-1);
+        if (m3b) {
+            last = m3b.at(-1);
         } else {
-          const m2b = cleanedString.match(/\[\[.*?\]\]/g);
-          if(m2b) last = `[${m2b.at(-1)}]`;
+            const m2b = cleanedString.match(/\[\[.*?\]\]/g);
+            if (m2b) last = `[${m2b.at(-1)}]`;
         }
         return JSON.parse(last);
     } catch (e) {
@@ -34,9 +35,10 @@ export const imagePath = (imageName) => {
 }
 
 export const img2b64 = async (imagePath) => {
-    const imageBuffer = await fs.promises.readFile(imagePath);
-    const base64Image = imageBuffer.toString('base64');
-    return `data:image/${imagePath.endsWith('.png') ? 'png' : 'jpeg'};base64,${base64Image}`;
+    const mimetype = `image/${imagePath.endsWith('.png') ? 'png' : 'jpeg'}`;
+    const image = await Jimp.read(imagePath);
+    image.resize({ w: 1024 });
+    return await image.getBase64(mimetype);
 }
 
 export const validateCards = (cards) => {
@@ -57,7 +59,7 @@ export const validateCards = (cards) => {
 }
 
 export const analytic = async (server, result, imagePath) => {
-    if(!ANALYTIC_APPID || !ANALYTIC_RESTID || !ANALYTIC_SERVER) return;
+    if (!ANALYTIC_APPID || !ANALYTIC_RESTID || !ANALYTIC_SERVER) return;
     const image = await img2b64(imagePath)
     const myHeaders = new Headers();
     myHeaders.append("X-Parse-Application-Id", ANALYTIC_APPID);

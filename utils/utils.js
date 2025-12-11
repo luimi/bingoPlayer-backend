@@ -8,12 +8,24 @@ const { ANALYTIC_SERVER, ANALYTIC_APPID, ANALYTIC_RESTID } = process.env
 
 export const md2json = (md) => {
     try {
-        const cleanedString = md.replace(/```json\n/g, '').replace(/\n```/g, '').trim();
-        const jsonObject = JSON.parse(cleanedString);
-        return jsonObject;
-    } catch (error) {
+        const cleanedString = md.replace(/```json\n/g, '')
+        .replace(/JSON/g, '')
+        .replace(/\n```/g, '')
+        .replace(/\s+/g, '')
+        .trim();
+      
+        const m3b = cleanedString.match(/\[\[\[.*?\]\]\]/g);
+        let last;
+        if(m3b) {
+          last = m3b.at(-1);
+        } else {
+          const m2b = cleanedString.match(/\[\[.*?\]\]/g);
+          if(m2b) last = `[${m2b.at(-1)}]`;
+        }
+        return JSON.parse(last);
+    } catch (e) {
+        console.error("Error parsing JSON string:");
         console.log(md)
-        console.error("Error parsing JSON string:", error);
         return null;
     }
 }

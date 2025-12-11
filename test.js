@@ -3,6 +3,7 @@ import openrouter from './utils/openrouter.js';
 import groq from './utils/groq.js';
 import manual from './utils/manual.js';
 import openai from './utils/openai.js';
+import huggingface from './utils/huggingface.js';
 import { imagePath, md2json, validateCards } from './utils/utils.js';
 
 const providers = {
@@ -11,6 +12,7 @@ const providers = {
     'groq': groq,
     'manual': manual,
     'openai': openai,
+    'huggingface': huggingface,
 }
 
 const [_, __, provider, image] = process.argv;

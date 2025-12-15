@@ -2,10 +2,17 @@ import path from 'path';
 import fs from 'fs';
 import dotenv from 'dotenv';
 import { Jimp } from 'jimp';
+import { v2 as cloudinary } from 'cloudinary';
 
 dotenv.config()
 
-const { ANALYTIC_SERVER, ANALYTIC_APPID, ANALYTIC_RESTID } = process.env
+const { ANALYTIC_SERVER, ANALYTIC_APPID, ANALYTIC_RESTID, CLOUDINARY_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = process.env
+
+cloudinary.config({
+    cloud_name: CLOUDINARY_NAME,
+    api_key: CLOUDINARY_API_KEY,
+    api_secret: CLOUDINARY_API_SECRET
+});
 
 export const md2json = (md) => {
     try {
@@ -59,8 +66,9 @@ export const validateCards = (cards) => {
 }
 
 export const analytic = async (server, result, imagePath) => {
-    if (!ANALYTIC_APPID || !ANALYTIC_RESTID || !ANALYTIC_SERVER) return;
+    if (!ANALYTIC_APPID || !ANALYTIC_RESTID || !ANALYTIC_SERVER || !CLOUDINARY_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) return;
     const image = await img2b64(imagePath)
+    const url = await uploadImage(image)
     const myHeaders = new Headers();
     myHeaders.append("X-Parse-Application-Id", ANALYTIC_APPID);
     myHeaders.append("X-Parse-REST-API-Key", ANALYTIC_RESTID);
@@ -69,7 +77,7 @@ export const analytic = async (server, result, imagePath) => {
     const raw = JSON.stringify({
         "server": server,
         "result": result,
-        "image": image
+        "image": url
     });
 
     const requestOptions = {
@@ -80,4 +88,13 @@ export const analytic = async (server, result, imagePath) => {
     };
 
     fetch(`${ANALYTIC_SERVER}/classes/CardsScan`, requestOptions);
+}
+
+export const uploadImage = async (image) => {
+    const uploadResult = await cloudinary.uploader
+        .upload( image, {} )
+        .catch((error) => {
+            console.log(error);
+        });
+    return uploadResult.url;
 }

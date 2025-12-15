@@ -17,6 +17,7 @@
   "dependencies": {
     "@google/genai": "^1.30.0",
     "@openrouter/sdk": "^0.2.9",
+    "cloudinary": "^2.8.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "groq-sdk": "^0.37.0",

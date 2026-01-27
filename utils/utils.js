@@ -103,5 +103,5 @@ export const deleteImage = async (imageId) => {
     const result = await cloudinary.uploader.destroy(imageId, {
         invalidate: true // Invalidate CDN cache
     });
-    console.log(result);
+    return result;
 }

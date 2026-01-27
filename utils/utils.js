@@ -92,9 +92,16 @@ export const analytic = async (server, result, imagePath) => {
 
 export const uploadImage = async (image) => {
     const uploadResult = await cloudinary.uploader
-        .upload( image, {} )
+        .upload(image, {})
         .catch((error) => {
             console.log(error);
         });
     return uploadResult.url;
+}
+
+export const deleteImage = async (imageId) => {
+    const result = await cloudinary.uploader.destroy(imageId, {
+        invalidate: true // Invalidate CDN cache
+    });
+    console.log(result);
 }

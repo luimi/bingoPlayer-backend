@@ -5,7 +5,7 @@ const multer = require('multer');
 const cron = require("node-cron");
 
 
-const { md2json, validateCards, analytic } = require('./utils/utils');
+const { md2json, validateCards, analytic, deleteImage } = require('./utils/utils');
 const gemini = require('./utils/gemini');
 const openrouter = require('./utils/openrouter');
 const groq = require('./utils/groq');
@@ -128,6 +128,12 @@ app.post('/scan', upload.single('image'), async (req, res) => {
 
 app.get('/status', (req, res) => {
     res.send({ status, limits })
+})
+app.delete('/analytic', async (req, res) => {
+    if(!req.query.id) {
+        return res.send({ success: false, code: 1 })
+    }
+    return await deleteImage(req.query.id)
 })
 
 app.listen(PORT, () => {

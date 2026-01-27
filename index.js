@@ -134,7 +134,7 @@ app.delete('/analytic', async (req, res) => {
     if(!req.query.id) {
         return res.send({ success: false, code: 1 })
     }
-    return await deleteImage(req.query.id)
+    res.send(await deleteImage(req.query.id)); 
 })
 
 app.listen(PORT, () => {

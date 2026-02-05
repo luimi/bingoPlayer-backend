@@ -91,7 +91,7 @@ app.post('/scan', upload.single('image'), async (req, res) => {
         const index = limits.length - 1;
         try {
             result = await providers[index].action(req.file.path);
-            analytic(providers[index].id, result, req.file.path)
+            if(!result) analytic(providers[index].id, result, req.file.path)
             limits[index]++;
             if (limits[index] === providers[index].limit && limits.length < providers.length) {
                 limits.push(0);

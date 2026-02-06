@@ -20,7 +20,6 @@ export const md2json = (md) => {
             .replace(/JSON/g, '')
             .replace(/\n```/g, '')
             .replace(/\s+/g, '')
-            .replace(/^0+/g, '')
             .trim();
         for (let i = 1; i < 10; i++) {
             cleanedString = cleanedString.replace(new RegExp(`0${i}`, 'g'), i)

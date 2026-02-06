@@ -16,18 +16,22 @@ cloudinary.config({
 
 export const md2json = (md) => {
     try {
-        const cleanedString = md.replace(/```json\n/g, '')
+        let cleanedString = md.replace(/```json\n/g, '')
             .replace(/JSON/g, '')
             .replace(/\n```/g, '')
             .replace(/\s+/g, '')
+            .replace(/^0+/g, '')
             .trim();
-
-        const m3b = cleanedString.match(/\[\[\[.*?\]\]\]/g);
+        for (let i = 1; i < 10; i++) {
+            cleanedString = cleanedString.replace(new RegExp(`0${i}`, 'g'), i)
+        }
+        //console.log("cleaned", cleanedString)
+        const m3b = cleanedString.match(/\[\[\[[0-9,\[\]\s]*\]\]\]/g);
         let last;
         if (m3b) {
             last = m3b.at(-1);
         } else {
-            const m2b = cleanedString.match(/\[\[.*?\]\]/g);
+            const m2b = cleanedString.match(/\[\[[0-9,\[\]\s]*\]\]/g);
             if (m2b) last = `[${m2b.at(-1)}]`;
         }
         return JSON.parse(last);

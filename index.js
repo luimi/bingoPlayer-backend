@@ -85,31 +85,39 @@ app.post('/scan', upload.single('image'), async (req, res) => {
         return res.send({ success: false, code: 1 })
     }
 
-    let result;
+    let md;
 
-    while (!result) {
+    while (!md) {
         const index = limits.length - 1;
         try {
-            result = await providers[index].action(req.file.path);
-            if(!result) analytic(providers[index].id, result, req.file.path)
+            md = await providers[index].action(req.file.path);
             limits[index]++;
             if (limits[index] === providers[index].limit && limits.length < providers.length) {
                 limits.push(0);
             }
         } catch (e) {
-            console.error("Ai failed:", providers[index].id ,e.message);
+            console.error("Ai failed:", providers[index].id, e.message);
             limits[index] = providers[index].limit;
-            if(limits.length === providers.length) {
-                result = [];
+            if (limits.length === providers.length) {
+                md = [];
             } else {
                 limits.push(0)
             }
-            
+
         }
     }
 
     if (limits.length === providers.length && limits.at(-1) === providers.at(-1).limit) {
         status = false;
+    }
+    let obj;
+    let result;
+    if (md) obj = md2json(md);
+    if (!obj || obj.length === 0 || !validateCards(obj)) {
+        analytic(providers[limits.length - 1].id, md, req.file.path)
+        result = { success: false, code: 4 }
+    } else {
+        result = { success: true, data: obj }
     }
 
     // Eliminar imagen subida
@@ -119,22 +127,17 @@ app.post('/scan', upload.single('image'), async (req, res) => {
         }
     });
 
-    if (result) result = md2json(result);
-
-    if (!result || result.length === 0 || !validateCards(result)) {
-        return res.send({ success: false, code: 4 })
-    }
-    return res.send({ success: true, data: result })
+    return res.send(result)
 })
 
 app.get('/status', (req, res) => {
     res.send({ status, limits })
 })
 app.delete('/analytic', async (req, res) => {
-    if(!req.query.id) {
+    if (!req.query.id) {
         return res.send({ success: false, code: 1 })
     }
-    res.send(await deleteImage(req.query.id)); 
+    res.send(await deleteImage(req.query.id));
 })
 
 app.listen(PORT, () => {

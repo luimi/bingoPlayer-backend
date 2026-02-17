@@ -33,9 +33,19 @@ export const md2json = (md) => {
             const m2b = cleanedString.match(/\[\[[0-9,\[\]\s]*\]\]/g);
             if (m2b) last = `[${m2b.at(-1)}]`;
         }
-        return JSON.parse(last);
+        let obj = JSON.parse(last);
+        if (obj.length === 1 && obj[0].length > 5 && obj[0].length % 5 === 0) {
+            const divided = obj[0].reduce((acc, _, i) => {
+                if (i % 5 === 0) {
+                    acc.push(obj[0].slice(i, i + 5));
+                }
+                return acc;
+            }, []);
+            obj = divided;
+        }
+        return obj;
     } catch (e) {
-        console.error("Error parsing JSON string:");
+        console.error("Error: ", e.message);
         console.log(md)
         return null;
     }

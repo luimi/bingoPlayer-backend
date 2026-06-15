@@ -9,11 +9,13 @@ const { md2json, validateCards, analytic, deleteImage } = require('./utils/utils
 const gemini = require('./utils/gemini');
 const openrouter = require('./utils/openrouter');
 const groq = require('./utils/groq');
+const nvidia = require('./utils/nvidia');
 
 const fs = require('fs');
 const app = express();
 
 const { PORT, GEMINI_API_KEY, GEMINI_MODEL, OPENROUTER_API_KEY, OPENROUTER_MODEL, GROQ_API_KEY, GROQ_MODEL } = process.env
+const { NVIDIA_API_KEY, NVIDIA_MODEL } = process.env
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -43,13 +45,19 @@ if (GEMINI_API_KEY && GEMINI_MODEL) {
     providers.push({ id: 'Gemini', action: gemini, limit: 50 })
 }
 
-if (GROQ_API_KEY && GROQ_MODEL) {
-    providers.push({ id: 'Groq', action: groq, limit: 1000 })
+if (NVIDIA_API_KEY && NVIDIA_MODEL) {
+    providers.push({ id: 'Nvidia', action: nvidia, limit: 1000 })
 }
 
 if (OPENROUTER_API_KEY && OPENROUTER_MODEL) {
     providers.push({ id: 'OpenRouter', action: openrouter, limit: 50 })
 }
+
+if (GROQ_API_KEY && GROQ_MODEL) {
+    providers.push({ id: 'Groq', action: groq, limit: 1000 })
+}
+
+
 
 
 cron.schedule(

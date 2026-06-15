@@ -44,11 +44,11 @@ Salida Requerida: Devuelve un único array en formato JSON (application/json) co
 Para cartones de 5x5:
 [
   [
-    [n1,n2,n3,n4,n5],
-    [n6,n7,n8,n9,n10],
-    [n11,n12,n13,n14,n15],
-    [n16,n17,n18,n19,n20],
-    [n21,n22,n23,n24,n25]
+    [1,16,31,46,61],
+    [5,20,35,50,65],
+    [8,23,0,53,68],
+    [11,26,41,56,71],
+    [15,30,45,60,75]
   ],
   ...
 ]
@@ -59,6 +59,7 @@ Reglas:
 - Si no se detectan cartones de bingo, devuelve un array vacío.
 - Solo considera cartones de 5x5 completos.
 - La imagen puede estar girada, pero debe ser capaz de extraer los datos correctamente.
+- El orden de la respuesta debe ser por filas, igual como lo estas sacando de la imagen
 
 
 Para cartones de 9x3:

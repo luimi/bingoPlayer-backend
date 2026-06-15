@@ -12,3 +12,11 @@ genera un script para nodejs donde implementes <nombre de proveedor> , exportes 
 
 haz el ejemplo usando la libreria de openai
 ```
+
+## Tests
+
+Ejecutar pruebas con modelos e imagenes
+
+```termina
+npm run test -- <proveedor> <imagen.jpg> 
+``` 

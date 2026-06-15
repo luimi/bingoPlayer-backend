@@ -4,6 +4,7 @@ import groq from './utils/groq.js';
 import manual from './utils/manual.js';
 import openai from './utils/openai.js';
 import huggingface from './utils/huggingface.js';
+import nvidia from './utils/nvidia.js';
 import { imagePath, md2json, validateCards } from './utils/utils.js';
 
 const providers = {
@@ -13,22 +14,28 @@ const providers = {
     'manual': manual,
     'openai': openai,
     'huggingface': huggingface,
+    'nvidia': nvidia,
 }
 
 const [_, __, provider, image] = process.argv;
 
-if(!provider || !image) {
+if (!provider || !image) {
     console.error("Provider or image missing");
     process.exit(0);
 }
 
-if(!providers[provider]) {
+if (!providers[provider]) {
     console.error(`Provider ${provider} does not exists`);
     process.exit(0);
 }
 
-let result = await providers[provider](imagePath(image))
-if (result) result = md2json(result);
-console.log("cards", result, "provider", provider, "image", image, "valid", validateCards(result));
+try {
+    let result = await providers[provider](imagePath(image))
+    if (result) result = md2json(result);
+    console.log("cards", result, "provider", provider, "image", image, "valid", validateCards(result));
+} catch (e) {
+    console.log("Error en la ejecucion", e.message);
+}
+
 
 process.exit(0);

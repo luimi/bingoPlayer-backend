@@ -65,6 +65,7 @@ cron.schedule(
     () => {
         limits = [0];
         status = true;
+        console.log("limites reiniciados");
     },
     {
         scheduled: true,

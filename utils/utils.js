@@ -16,10 +16,12 @@ cloudinary.config({
 
 export const md2json = (md) => {
     try {
-        let cleanedString = md.replace(/```json\n/g, '')
+        let cleanedString = md.toLowerCase()
+            .replace(/```json\n/g, '')
             .replace(/JSON/g, '')
             .replace(/\n```/g, '')
             .replace(/\s+/g, '')
+            .replace("\"free\"", 0)
             .trim();
         for (let i = 1; i < 10; i++) {
             cleanedString = cleanedString.replace(new RegExp(`0${i}`, 'g'), i)

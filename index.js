@@ -45,6 +45,10 @@ if (GEMINI_API_KEY && GEMINI_MODEL) {
     providers.push({ id: 'Gemini', action: gemini, limit: 50 })
 }
 
+if (GROQ_API_KEY && GROQ_MODEL) {
+    providers.push({ id: 'Groq', action: groq, limit: 1000 })
+}
+
 if (NVIDIA_API_KEY && NVIDIA_MODEL) {
     providers.push({ id: 'Nvidia', action: nvidia, limit: 1000 })
 }
@@ -53,9 +57,6 @@ if (OPENROUTER_API_KEY && OPENROUTER_MODEL) {
     providers.push({ id: 'OpenRouter', action: openrouter, limit: 50 })
 }
 
-if (GROQ_API_KEY && GROQ_MODEL) {
-    providers.push({ id: 'Groq', action: groq, limit: 1000 })
-}
 
 
 

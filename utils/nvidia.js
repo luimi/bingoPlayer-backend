@@ -24,7 +24,7 @@ const getCards = async (imagePath) => {
                     {
                         type: 'image_url',
                         'image_url': {
-                            url: `data:${base64Image}`,
+                            url: base64Image,
                         },
                     },
                 ],

@@ -20,7 +20,7 @@ const providers = {
 const [_, __, provider, image] = process.argv;
 
 if (!provider || !image) {
-    console.error("Provider or image missing");
+    console.error("Provider or image missing, use 'npm run test -- provider image'");
     process.exit(0);
 }
 

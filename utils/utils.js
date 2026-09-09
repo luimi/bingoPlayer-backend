@@ -26,7 +26,6 @@ export const md2json = (md) => {
         for (let i = 1; i < 10; i++) {
             cleanedString = cleanedString.replace(new RegExp(`0${i}`, 'g'), i)
         }
-        //console.log("cleaned", cleanedString)
         const m3b = cleanedString.match(/\[\[\[[0-9,\[\]\s]*\]\]\]/g);
         let last;
         if (m3b) {
@@ -47,8 +46,6 @@ export const md2json = (md) => {
         }
         return obj;
     } catch (e) {
-        console.error("Error: ", e.message);
-        console.log(md)
         return null;
     }
 }
@@ -109,7 +106,7 @@ export const uploadImage = async (image) => {
     const uploadResult = await cloudinary.uploader
         .upload(image, {})
         .catch((error) => {
-            console.log(error);
+            console.error("cloudinary", error.message);
         });
     return uploadResult.url;
 }

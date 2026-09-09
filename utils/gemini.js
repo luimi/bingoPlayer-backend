@@ -3,9 +3,9 @@ const { GoogleGenAI }  = require("@google/genai");
 const { prompt } = require('../utils/constants');
 const fs = require("fs");
 
-const { GEMINI_MODEL } = process.env
+const { GEMINI_API_KEY, GEMINI_MODEL } = process.env
 
-const ai = new GoogleGenAI({});
+const ai = new GoogleGenAI({apiKey: GEMINI_API_KEY});
 
 const getCards = async (imagePath) => {
 

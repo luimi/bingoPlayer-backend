@@ -42,19 +42,19 @@ const upload = multer({ storage: storage });
 const providers = []
 
 if (GEMINI_API_KEY && GEMINI_MODEL) {
-    providers.push({ id: 'Gemini', action: gemini, limit: 50 })
+    providers.push({ id: 'Gemini', action: gemini, limit: 1500, used: 0 })
 }
 
 if (GROQ_API_KEY && GROQ_MODEL) {
-    providers.push({ id: 'Groq', action: groq, limit: 1000 })
+    providers.push({ id: 'Groq', action: groq, limit: 1000, used: 0 })
 }
 
 if (NVIDIA_API_KEY && NVIDIA_MODEL) {
-    providers.push({ id: 'Nvidia', action: nvidia, limit: 1000 })
+    providers.push({ id: 'Nvidia', action: nvidia, limit: 1000, used: 0 })
 }
 
 if (OPENROUTER_API_KEY && OPENROUTER_MODEL) {
-    providers.push({ id: 'OpenRouter', action: openrouter, limit: 50 })
+    providers.push({ id: 'OpenRouter', action: openrouter, limit: 50, used: 0 })
 }
 
 
@@ -64,9 +64,8 @@ if (OPENROUTER_API_KEY && OPENROUTER_MODEL) {
 cron.schedule(
     "0 0 * * *",
     () => {
-        limits = [0];
-        status = true;
         console.log("* limites reiniciados");
+        process.exit(1);
     },
     {
         scheduled: true,
@@ -74,7 +73,6 @@ cron.schedule(
     }
 );
 
-let limits = [0];
 let status = true;
 
 app.get('/', (req, res) => {
@@ -96,35 +94,25 @@ app.post('/scan', upload.single('image'), async (req, res) => {
     }
 
     let md;
-
-    while (!md) {
-        const index = limits.length - 1;
+    let provider
+    for (let index = 0; index < providers.length; index++) {
+        provider = providers[index];
+        if (provider.used >= provider.limit) continue;
         try {
-            md = await providers[index].action(req.file.path);
-            limits[index]++;
-            if (limits[index] === providers[index].limit && limits.length < providers.length) {
-                limits.push(0);
-            }
-        } catch (e) {
-            console.error("Ai failed:", providers[index].id, e.message);
-            limits[index] = providers[index].limit;
-            if (limits.length === providers.length) {
-                md = [];
-            } else {
-                limits.push(0)
-            }
-
-        }
+            md = await provider.action(req.file.path);
+            provider.used++;
+            break;
+        } catch (e) { }
     }
+    status = !providers.every(provider => provider.used === provider.limit);
 
-    if (limits.length === providers.length && limits.at(-1) === providers.at(-1).limit) {
-        status = false;
-    }
+    if(!md) return res.send({success: false, code: 4});
+
     let obj;
     let result;
     if (md) obj = md2json(md);
     if (!obj || obj.length === 0 || !validateCards(obj)) {
-        analytic(providers[limits.length - 1].id, md, req.file.path)
+        analytic(provider.id, md, req.file.path)
         result = { success: false, code: 4 }
     } else {
         result = { success: true, data: obj }
@@ -141,7 +129,7 @@ app.post('/scan', upload.single('image'), async (req, res) => {
 })
 
 app.get('/status', (req, res) => {
-    res.send({ status, limits })
+    res.send({ status, limits: providers.map((provider) => {return{limit: provider.limit, used: provider.used, name: provider.id} }) })
 })
 app.delete('/analytic', async (req, res) => {
     if (!req.query.id) {

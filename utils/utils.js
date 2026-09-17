@@ -22,6 +22,9 @@ export const md2json = (md) => {
             .replace(/\n```/g, '')
             .replace(/\s+/g, '')
             .replace("\"free\"", 0)
+            .replace(/\"/g, '')
+            .replace(/{/g, '[')
+            .replace(/}/g, ']')
             .trim();
         for (let i = 1; i < 10; i++) {
             cleanedString = cleanedString.replace(new RegExp(`0${i}`, 'g'), i)

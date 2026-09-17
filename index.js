@@ -14,8 +14,11 @@ const nvidia = require('./utils/nvidia');
 const fs = require('fs');
 const app = express();
 
-const { PORT, GEMINI_API_KEY, GEMINI_MODEL, OPENROUTER_API_KEY, OPENROUTER_MODEL, GROQ_API_KEY, GROQ_MODEL } = process.env
-const { NVIDIA_API_KEY, NVIDIA_MODEL } = process.env
+const { PORT } = process.env
+const { GROQ_API_KEY, GROQ_MODEL, GROQ_LIMIT }= process.env
+const { OPENROUTER_API_KEY, OPENROUTER_MODEL, OPENROUTER_LIMIT }= process.env
+const { GEMINI_API_KEY, GEMINI_MODEL, GEMINI_LIMIT }= process.env
+const { NVIDIA_API_KEY, NVIDIA_MODEL, NVIDIA_LIMIT } = process.env
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -41,20 +44,20 @@ const upload = multer({ storage: storage });
 
 const providers = []
 
-if (GEMINI_API_KEY && GEMINI_MODEL) {
-    providers.push({ id: 'Gemini', action: gemini, limit: 1500, used: 0 })
+if (GEMINI_API_KEY && GEMINI_MODEL && GEMINI_LIMIT) {
+    providers.push({ id: 'Gemini', action: gemini, limit: parseInt(GEMINI_LIMIT), used: 0 })
 }
 
-if (GROQ_API_KEY && GROQ_MODEL) {
-    providers.push({ id: 'Groq', action: groq, limit: 1000, used: 0 })
+if (GROQ_API_KEY && GROQ_MODEL && GROQ_LIMIT) {
+    providers.push({ id: 'Groq', action: groq, limit: parseInt(GROQ_LIMIT), used: 0 })
 }
 
-if (NVIDIA_API_KEY && NVIDIA_MODEL) {
-    providers.push({ id: 'Nvidia', action: nvidia, limit: 1000, used: 0 })
+if (NVIDIA_API_KEY && NVIDIA_MODEL && NVIDIA_LIMIT) {
+    providers.push({ id: 'Nvidia', action: nvidia, limit: parseInt(NVIDIA_LIMIT), used: 0 })
 }
 
-if (OPENROUTER_API_KEY && OPENROUTER_MODEL) {
-    providers.push({ id: 'OpenRouter', action: openrouter, limit: 50, used: 0 })
+if (OPENROUTER_API_KEY && OPENROUTER_MODEL && OPENROUTER_LIMIT) {
+    providers.push({ id: 'OpenRouter', action: openrouter, limit: parseInt(OPENROUTER_LIMIT), used: 0 })
 }
 
 
